@@ -9,20 +9,27 @@ import Foundation
 
 @Observable
 class UserViewModel {
+    var user: User = User(id: "test", name: "Test User")
     var watchList: [Movie] = []
     var ratings: [Rating] = []
     var watched: [Movie] = []
+    var selectedTab: Int = 0
     
     func addMovie(name: String, duration: Int, year: Int) {
-        watchList.append(Movie(name: name, duration: duration, year: year))
+        let movie = Movie(name: name, duration: duration, year: year)
+        watchList.append(movie)
     }
     
     func addRating(movie: Movie, stars: Int, comment: String) {
-        ratings.append(Rating(movie: movie, stars: stars, comment: comment))
+        let rating = Rating(movie: movie, stars: stars, comment: comment)
+        ratings.append(rating)
+        watched.removeAll { $0.id == movie.id}
+        selectedTab = 1
     }
     
     func addWatched(movie: Movie) {
         watched.append(movie)
+        watched[watched.count - 1].status = 1
         watchList.removeAll { $0.id == movie.id }
     }
     
@@ -32,6 +39,10 @@ class UserViewModel {
             ratings[index].stars = stars
             ratings[index].comment = comment
         }
+    }
+    
+    func removeMovieFromList(movie: Movie) {
+        watchList.removeAll { $0.id == movie.id }
     }
 
 }

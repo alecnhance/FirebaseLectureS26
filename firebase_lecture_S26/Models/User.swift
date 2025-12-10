@@ -7,6 +7,6 @@
 import SwiftUI
 
 struct User {
-    var id: UUID = UUID()
+    var id: String
     var name: String
 }
