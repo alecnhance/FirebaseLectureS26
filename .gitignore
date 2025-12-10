@@ -61,4 +61,11 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 
+# macOS system files
 .DS_Store
+
+# Xcode user-specific files
+*.xcuserstate
+project.xcworkspace/
+xcuserdata/
+
