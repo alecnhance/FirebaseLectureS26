@@ -16,7 +16,7 @@ struct MovieCard: View {
             VStack(alignment: .leading) {
                 Text(movie.name).font(.title)
                 Text("\(movie.duration) Minutes Long")
-                Text("Released in \(movie.year)")
+                Text("Released in \(String(movie.year))")
             }
             Spacer()
             if watched {

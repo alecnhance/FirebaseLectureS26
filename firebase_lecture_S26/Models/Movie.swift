@@ -12,4 +12,5 @@ struct Movie: Identifiable {
     var name: String
     var duration: Int
     var year: Int
+    var status: Int = 0
 }

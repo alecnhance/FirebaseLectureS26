@@ -20,7 +20,7 @@ struct ReviewView: View {
             Text("Review").font(.title).bold()
             Text("\(movie.name)").font(.headline)
             HStack {
-                Text("Released \(movie.year)").foregroundStyle(.gray)
+                Text("Released \(String(movie.year))").foregroundStyle(.gray)
                 Spacer()
                 Text("\(movie.duration) minutes").foregroundStyle(.gray)
             }
@@ -54,6 +54,12 @@ struct ReviewView: View {
                 }.padding(.top, 15).buttonStyle(.borderedProminent).frame(maxWidth: .infinity, alignment: .center).tint(.black)
             }
         }.padding()
+            .onAppear() {
+                if let old = oldRating {
+                    comment = old.comment
+                    rating = old.stars
+                }
+            }
     }
 }
 
