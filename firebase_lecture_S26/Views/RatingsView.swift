@@ -19,7 +19,7 @@ struct RatingsView: View {
                     RatingCard(rating: rating)
                 }
                 Spacer()
-        
+                
                 
             }.padding()
         }

@@ -10,24 +10,30 @@ import SwiftUI
 struct ContentView: View {
     @State var vm: UserViewModel = UserViewModel()
     var body: some View {
-        TabView {
+        TabView(selection: $vm.selectedTab) {
             WatchListView()
                 .tabItem {
                     Image(systemName: "list.bullet")
                     Text("List")
                 }
+                .tag(0)
             RatingsView()
                 .tabItem {
                     Image(systemName: "star.fill")
                    Text("Ratings")
                 }
+                .tag(1)
             WatchedView()
                 .tabItem {
                     Image(systemName: "checkmark.square.fill")
                     Text("Watched")
                 }
+                .tag(2)
         }
         .environment(vm)
+        .task {
+            await vm.loadAllData()
+        }
     }
 }
 

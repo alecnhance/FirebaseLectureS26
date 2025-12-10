@@ -20,7 +20,7 @@ struct ReviewView: View {
             Text("Review").font(.title).bold()
             Text("\(movie.name)").font(.headline)
             HStack {
-                Text("Released \(movie.year)").foregroundStyle(.gray)
+                Text("Released \(String(movie.year))").foregroundStyle(.gray)
                 Spacer()
                 Text("\(movie.duration) minutes").foregroundStyle(.gray)
             }
@@ -44,16 +44,26 @@ struct ReviewView: View {
             }.padding(.top, 15)
             if update {
                 Button("Update") {
-                    vm.updateRating(rating: oldRating!, stars: rating, comment: comment.isEmpty ? "no Comment" : comment)
+                    Task {
+                        await vm.updateRating(rating: oldRating!, stars: rating, comment: comment.isEmpty ? "no Comment" : comment)
+                    }
                     dismiss()
                 }.padding(.top, 15).buttonStyle(.borderedProminent).frame(maxWidth: .infinity, alignment: .center).tint(.black)
             } else {
                 Button("Submit") {
-                    vm.addRating(movie: movie, stars: rating, comment: comment.isEmpty ? "No comment" : comment)
+                    Task {
+                        await vm.addRating(movie: movie, stars: rating, comment: comment.isEmpty ? "No comment" : comment)
+                    }
                     dismiss()
                 }.padding(.top, 15).buttonStyle(.borderedProminent).frame(maxWidth: .infinity, alignment: .center).tint(.black)
             }
         }.padding()
+            .onAppear() {
+                if let old = oldRating {
+                    comment = old.comment
+                    rating = old.stars
+                }
+            }
     }
 }
 

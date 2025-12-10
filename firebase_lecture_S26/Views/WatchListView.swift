@@ -20,7 +20,15 @@ struct WatchListView: View {
                     }
                 }
                 ForEach(viewModel.watchList) { movie in
-                    MovieCard(movie: movie, watched: false).transition(.scale)
+                    MovieCard(movie: movie, watched: false).transition(.scale).contextMenu {
+                        Button(role: .destructive) {
+                            Task {
+                                await viewModel.removeMovieFromList(movie: movie)
+                            }
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
                 }
                 Spacer()
         

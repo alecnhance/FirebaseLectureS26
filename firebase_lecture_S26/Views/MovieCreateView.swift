@@ -20,10 +20,12 @@ struct MovieCreateView: View {
             TextField("Duration", text: $duration).textFieldStyle(.roundedBorder)
             TextField("Release Year", text: $year).textFieldStyle(.roundedBorder)
             Button("Add Movie") {
-                vm.addMovie(name: title.isEmpty ? "No Title" : title, duration: Int(duration) ?? 120, year: Int(year) ?? 2025)
-                title = ""
-                duration = ""
-                year = ""
+                Task {
+                    await vm.addMovie(name: title.isEmpty ? "No Title" : title, duration: Int(duration) ?? 120, year: Int(year) ?? 2025)
+                    title = ""
+                    duration = ""
+                    year = ""
+                }
                 dismiss()
             }.buttonStyle(.glassProminent).tint(.black)
             Spacer()
