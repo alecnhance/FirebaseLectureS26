@@ -8,14 +8,26 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State var vm: UserViewModel = UserViewModel()
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        TabView {
+            WatchListView()
+                .tabItem {
+                    Image(systemName: "list.bullet")
+                    Text("List")
+                }
+            RatingsView()
+                .tabItem {
+                    Image(systemName: "star.fill")
+                   Text("Ratings")
+                }
+            WatchedView()
+                .tabItem {
+                    Image(systemName: "checkmark.square.fill")
+                    Text("Watched")
+                }
         }
-        .padding()
+        .environment(vm)
     }
 }
 
