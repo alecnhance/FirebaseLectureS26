@@ -7,6 +7,7 @@
 
 import Foundation
 import FirebaseFirestore
+import FirebaseAuth
 
 
 class FirebaseService {
@@ -17,8 +18,56 @@ class FirebaseService {
         db = Firestore.firestore()
     }
     
+    func signUp(email: String, password: String, name: String) async -> String? {
+        do {
+            let result = try await Auth.auth().createUser(withEmail: email, password: password)
+            let userData: [String: Any] = [
+                "name": name
+            ]
+            let ref = db.collection("USERS").document(result.user.uid)
+            try await ref.setData(userData)
+            return result.user.uid
+        } catch {
+            print("Error with signing up: \(error)")
+        }
+        return nil
+    }
+    
+    func signIn(email: String, password: String) async -> String? {
+        do {
+            let result = try await Auth.auth().signIn(withEmail: email, password: password)
+            return result.user.uid
+        } catch {
+            print("Error signing in: \(error)")
+        }
+        return nil
+    }
+    
+    func signOut() {
+        do {
+            try Auth.auth().signOut()
+        } catch {
+            print("error signing out: \(error)")
+        }
+    }
+    
+    func getName() async -> String? {
+        guard let userID = Auth.auth().currentUser?.uid else { return nil }
+        let ref = db.collection("USERS").document(userID)
+        do {
+            let document = try await ref.getDocument()
+            if document.exists {
+                return document.data()?["name"] as? String
+            }
+        } catch {
+            print("error getting display name: \(error)")
+        }
+        return nil
+    }
+    
     func getMovie(movieID: String) async -> Movie? {
-        let ref = db.collection("USERS").document("test").collection("MOVIES").document(movieID)
+        guard let userID = Auth.auth().currentUser?.uid else { return nil }
+        let ref = db.collection("USERS").document(userID).collection("MOVIES").document(movieID)
         do {
             let document = try await ref.getDocument()
             if document.exists {
@@ -33,7 +82,8 @@ class FirebaseService {
     }
     
     func removeFromWatchList(movie: Movie) async {
-        let ref = db.collection("USERS").document("test").collection("MOVIES").document(movie.id.uuidString)
+        guard let userID = Auth.auth().currentUser?.uid else { return }
+        let ref = db.collection("USERS").document(userID).collection("MOVIES").document(movie.id.uuidString)
         do {
             try await ref.delete()
         } catch {
@@ -42,7 +92,8 @@ class FirebaseService {
     }
     
     func getMovies() async -> [Movie] {
-        let ref = db.collection("USERS").document("test").collection("MOVIES")
+        guard let userID = Auth.auth().currentUser?.uid else { return [] }
+        let ref = db.collection("USERS").document(userID).collection("MOVIES")
         var movies: [Movie] = []
         do {
             let querySnapshot = try await ref.getDocuments()
@@ -69,7 +120,8 @@ class FirebaseService {
     }
     
     func getRatings() async -> [Rating] {
-        let ref = db.collection("USERS").document("test").collection("RATINGS")
+        guard let userID = Auth.auth().currentUser?.uid else { return [] }
+        let ref = db.collection("USERS").document(userID).collection("RATINGS")
         var ratings: [Rating] = []
         do {
             let querySnapshot = try await ref.getDocuments()
@@ -91,8 +143,9 @@ class FirebaseService {
     }
     
     func addRating(rating: Rating) async {
-        let refRatings = db.collection("USERS").document("test").collection("RATINGS")
-        let refMovies = db.collection("USERS").document("test").collection("MOVIES")
+        guard let userID = Auth.auth().currentUser?.uid else { return }
+        let refRatings = db.collection("USERS").document(userID).collection("RATINGS")
+        let refMovies = db.collection("USERS").document(userID).collection("MOVIES")
         do {
             try await refRatings.document(rating.id.uuidString).setData([
                 "movieID": rating.movie.id.uuidString,
@@ -112,7 +165,8 @@ class FirebaseService {
     }
     
     func addToWatchlist(movie: Movie) async {
-        let ref = db.collection("USERS").document("test").collection("MOVIES")
+        guard let userID = Auth.auth().currentUser?.uid else { return }
+        let ref = db.collection("USERS").document(userID).collection("MOVIES")
         do {
             try ref.document(movie.id.uuidString).setData(from: movie) // Eventual write
 //            try await ref.document(movie.id.uuidString).setData([
@@ -128,7 +182,8 @@ class FirebaseService {
     }
     
     func watchMovie(movie: Movie) async {
-        let ref = db.collection("USERS").document("test").collection("MOVIES")
+        guard let userID = Auth.auth().currentUser?.uid else { return }
+        let ref = db.collection("USERS").document(userID).collection("MOVIES")
         do {
             try await ref.document(movie.id.uuidString).updateData(["status": 1])
             print("Success watching movie")

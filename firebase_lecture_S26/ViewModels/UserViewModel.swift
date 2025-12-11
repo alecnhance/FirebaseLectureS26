@@ -10,7 +10,7 @@ import SwiftUI
 
 @Observable
 class UserViewModel {
-    var user: User = User(id: "test", name: "Test User")
+    var user: User? = nil
     let service: FirebaseService
     var watchList: [Movie] = []
     var ratings: [Rating] = []
@@ -19,6 +19,25 @@ class UserViewModel {
     
     init(service: FirebaseService = FirebaseService.shared) {
         self.service = service
+    }
+    
+    func signUp(email: String, password: String, name: String) async {
+        if let id = await service.signUp(email: email, password: password, name: name) {
+            self.user = User(id: id, name: name)
+            await loadAllData()
+        }
+    }
+    
+    func signIn(email: String, password: String) async {
+        if let id = await service.signIn(email: email, password: password) {
+            self.user = User(id: id, name: "")
+            await loadAllData()
+        }
+    }
+    
+    func signOut() {
+        service.signOut()
+        user = nil
     }
     
     func addMovie(name: String, duration: Int, year: Int) async {
@@ -63,6 +82,11 @@ class UserViewModel {
     func loadAllData() async {
         let movies = await service.getMovies()
         let ratings = await service.getRatings()
+        let name = await service.getName()
+        if let unwrapped = name {
+            user?.name = unwrapped
+        }
+
         
         self.watchList = movies.filter {
             $0.status == 0
