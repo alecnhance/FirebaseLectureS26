@@ -29,6 +29,12 @@ struct ContentView: View {
                     Text("Watched")
                 }
                 .tag(2)
+            ProfileView()
+                .tabItem {
+                    Image(systemName: "gear")
+                    Text("Profile")
+                }
+                .tag(3)
         }
         .environment(vm)
     }
