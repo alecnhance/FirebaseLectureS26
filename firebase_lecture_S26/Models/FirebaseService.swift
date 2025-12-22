@@ -18,6 +18,13 @@ class FirebaseService {
         db = Firestore.firestore()
     }
     
+    var currentUser: User? {
+        guard let user = Auth.auth().currentUser else {
+            return nil
+        }
+        return User(id: user.uid, name: "")
+    }
+    
     func signUp(email: String, password: String, name: String) async -> String? {
         do {
             let result = try await Auth.auth().createUser(withEmail: email, password: password)

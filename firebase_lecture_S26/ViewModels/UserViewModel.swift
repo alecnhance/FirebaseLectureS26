@@ -19,6 +19,13 @@ class UserViewModel {
     
     init(service: FirebaseService = FirebaseService.shared) {
         self.service = service
+        if let userSafe = service.currentUser {
+            self.user = userSafe
+        }
+        
+        Task {
+            await loadAllData()
+        }
     }
     
     func signUp(email: String, password: String, name: String) async {
